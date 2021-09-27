@@ -3,6 +3,7 @@ import time
 from bs4 import BeautifulSoup
 from collections import namedtuple
 
+
 News = namedtuple('News', 'date source title description link media')
 all_news = []
 
