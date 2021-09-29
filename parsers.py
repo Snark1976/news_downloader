@@ -11,9 +11,9 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                          'Safari/537.36'}
 
 
-def parser_n_plus_1():
+def parser_n_plus_1(url):
     result = []
-    page = requests.get('https://nplus1.ru/rss', headers=headers)
+    page = requests.get(url, headers=headers)
 
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, 'xml')
@@ -33,9 +33,9 @@ def parser_n_plus_1():
         return result
 
 
-def parser_dev_by():
+def parser_dev_by(url):
     result = []
-    page = requests.get('https://dev.by/rss', headers=headers)
+    page = requests.get(url, headers=headers)
 
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, 'xml')
@@ -55,9 +55,9 @@ def parser_dev_by():
         return result
 
 
-def parser_bbc_russian():
+def parser_bbc_russian(url):
     result = []
-    page = requests.get('http://feeds.bbci.co.uk/russian/rss.xml', headers=headers)
+    page = requests.get(url, headers=headers)
 
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, 'xml')
@@ -77,9 +77,9 @@ def parser_bbc_russian():
         return result
 
 
-def parser_deutsche_welle():
+def parser_deutsche_welle(url):
     result = []
-    page = requests.get('https://rss.dw.com/xml/rss-ru-all', headers=headers)
+    page = requests.get(url, headers=headers)
 
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, 'xml')
@@ -99,9 +99,9 @@ def parser_deutsche_welle():
         return result
 
 
-def parser_lenta_ru():
+def parser_lenta_ru(url):
     result = []
-    page = requests.get('https://lenta.ru/rss/', headers=headers)
+    page = requests.get(url, headers=headers)
 
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, 'xml')
@@ -121,18 +121,18 @@ def parser_lenta_ru():
         return result
 
 
-def parser_century22():
+def parser_century22(url):
     result = []
     all_news_this_source = []
 
-    page = requests.get('https://22century.ru/news/', headers=headers)
+    page = requests.get(url[0], headers=headers)
 
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, 'lxml')
         all_news_this_source.append(soup.find('article', class_='article-item article-item-3_4'))
         all_news_this_source.extend(soup.find_all('article', class_='article-item article-item-1_2'))
 
-    page = requests.get('https://22century.ru/popular-science-publications/', headers=headers)
+    page = requests.get(url[1], headers=headers)
 
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, 'lxml')
@@ -158,11 +158,12 @@ dict_parsers = {'https://nplus1.ru/rss': parser_n_plus_1,
                 'http://feeds.bbci.co.uk/russian/rss.xml': parser_bbc_russian,
                 'https://rss.dw.com/xml/rss-ru-all': parser_deutsche_welle,
                 'https://lenta.ru/rss/': parser_lenta_ru,
-                'https://22century.ru/news & https://22century.ru/popular-science-publications)': parser_century22,
+                ('https://22century.ru/news',
+                 'https://22century.ru/popular-science-publications)'): parser_century22,
                 }
 
 all_news = []
-for parser in dict_parsers.values():
-    all_news.extend(parser())
+for url, parser in dict_parsers.items():
+    all_news.extend(parser(url))
 
 print(*sorted(all_news, reverse=True), len(all_news), sep='\n')
