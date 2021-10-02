@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 from collections import namedtuple
 
 
-News = namedtuple('News', 'date source title description link media')
+News = namedtuple('News', 'date source title description link media tags')
+
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                          'AppleWebKit/537.36 (KHTML, like Gecko) '
                          'Chrome/94.0.4606.61 '
@@ -26,7 +27,8 @@ def parser_n_plus_1(url):
                         title=news_this_source.title.text,
                         description=news_this_source.description.text.strip(),
                         link=news_this_source.link.text,
-                        media=str(news_this_source.find('media:content')).split('"')[3]
+                        media=str(news_this_source.find('media:content')).split('"')[3],
+                        tags=None
                         )
             result.append(news)
 
@@ -48,7 +50,8 @@ def parser_dev_by(url):
                         title=news_this_source.title.text,
                         description=news_this_source.description.text.strip().replace('\xa0', ' '),
                         link=news_this_source.link.text,
-                        media=str(news_this_source.find('enclosure')).split('"')[3]
+                        media=str(news_this_source.find('enclosure')).split('"')[3],
+                        tags=None
                         )
             result.append(news)
 
@@ -70,7 +73,8 @@ def parser_bbc_russian(url):
                         title=news_this_source.title.text,
                         description=news_this_source.description.text.strip(),
                         link=news_this_source.link.text,
-                        media=None
+                        media=None,
+                        tags=None
                         )
             result.append(news)
 
@@ -92,7 +96,8 @@ def parser_deutsche_welle(url):
                         title=news_this_source.title.text,
                         description=news_this_source.description.text.strip(),
                         link=news_this_source.link.text,
-                        media=None
+                        media=None,
+                        tags=None
                         )
             result.append(news)
 
@@ -114,7 +119,8 @@ def parser_lenta_ru(url):
                         title=news_this_source.title.text,
                         description=news_this_source.description.text.strip(),
                         link=news_this_source.link.text,
-                        media=str(news_this_source.find('enclosure')).split('"')[5]
+                        media=str(news_this_source.find('enclosure')).split('"')[5],
+                        tags=None
                         )
             result.append(news)
 
@@ -146,7 +152,8 @@ def parser_century22(url):
                     title=news_this_source.select('h3.item_link a')[0].text.strip().replace('\xa0', ' '),
                     description=None,
                     link=news_this_source.select('h3.item_link a')[0]['href'],
-                    media=news_this_source.select('img')[0]['src']
+                    media=news_this_source.select('img')[0]['src'],
+                    tags=None
                     )
         result.append(news)
 
