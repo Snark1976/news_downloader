@@ -19,7 +19,6 @@ def parser_n_plus_1(url):
         for news_this_source in all_news_this_source:
             news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-6],
                                                       "%a, %d %b %Y %H:%M:%S")) - 3 * 60 * 60,
-                    'source_id': 1,
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip(),
                     'link': news_this_source.link.text,
@@ -42,7 +41,6 @@ def parser_dev_by(url):
         for news_this_source in all_news_this_source:
             news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
                                                       "%a, %d %b %Y %H:%M:%S")),
-                    'source': 'dev.by',
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip().replace('\xa0', ' '),
                     'link': news_this_source.link.text,
@@ -65,7 +63,6 @@ def parser_bbc_russian(url):
         for news_this_source in all_news_this_source:
             news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
                                                       "%a, %d %b %Y %H:%M:%S")),
-                    'source': 'bbc.com/russian',
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip(),
                     'link': news_this_source.link.text,
@@ -88,7 +85,6 @@ def parser_deutsche_welle(url):
         for news_this_source in all_news_this_source:
             news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
                                                       "%a, %d %b %Y %H:%M:%S")),
-                    'source': 'dw.com/ru',
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip(),
                     'link': news_this_source.link.text,
@@ -111,7 +107,6 @@ def parser_lenta_ru(url):
         for news_this_source in all_news_this_source:
             news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-6],
                                                       "%a, %d %b %Y %H:%M:%S")) - 3 * 60 * 60,
-                    'source': 'lenta.ru',
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip(),
                     'link': news_this_source.link.text,
@@ -144,7 +139,6 @@ def parser_century22(*url):
     for news_this_source in all_news_this_source:
         news = {'date': time.mktime(time.strptime(news_this_source.select('time')[0]['datatime'],
                                                   "%Y-%m-%d")),
-                'source': 'century22.ru',
                 'title': news_this_source.select('h3.item_link a')[0].text.strip().replace('\xa0', ' '),
                 'description': None,
                 'link': news_this_source.select('h3.item_link a')[0]['href'],
@@ -157,13 +151,13 @@ def parser_century22(*url):
 
 
 list_parsers = [{'name': 'N+1: научные статьи, новости, открытия',
-                 'url': 'https://nplus1.ru/',
+                 'url': 'https://nplus1.ru',
                  'logo': 'https://nplus1.ru/i/logo.png',
                  'links_of_parse': ('https://nplus1.ru/rss', ),
                  'func_parser': parser_n_plus_1
                  },
                 {'name': 'ИТ в Беларуси | dev.by',
-                 'url': 'https://dev.by/',
+                 'url': 'https://dev.by',
                  'logo': 'https://dev.by/assets/logo-c39214c7aad5915941bcf4ccda40ac3641f2851d5ec7e897270da373ed9701ad.svg',
                  'links_of_parse': ('https://dev.by/rss', ),
                  'func_parser': parser_dev_by
@@ -181,13 +175,13 @@ list_parsers = [{'name': 'N+1: научные статьи, новости, от
                  'func_parser': parser_deutsche_welle
                  },
                 {'name': 'Lenta.ru - Новости России и мира сегодня',
-                 'url': 'https://lenta.ru/',
+                 'url': 'https://lenta.ru',
                  'logo': 'https://lenta.ru/images/icons/icon-512x512.png',
                  'links_of_parse': ('https://lenta.ru/rss/', ),
                  'func_parser': parser_lenta_ru
                  },
                 {'name': 'Новости науки, техники и технологий. 22 век',
-                 'url': 'https://22century.ru/',
+                 'url': 'https://22century.ru',
                  'logo': 'https://22century.ru/wp-content/themes/xxiicentury_new/images/22_century_logo.png',
                  'links_of_parse': ('https://22century.ru/news',
                                     'https://22century.ru/popular-science-publications)'),
