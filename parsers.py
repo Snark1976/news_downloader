@@ -1,10 +1,6 @@
 import requests
 import time
 from bs4 import BeautifulSoup
-from collections import namedtuple
-
-
-News = namedtuple('News', 'date source title description link media tags')
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                          'AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -21,15 +17,15 @@ def parser_n_plus_1(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = News(date=time.mktime(time.strptime(news_this_source.pubDate.text[:-6],
-                                                       "%a, %d %b %Y %H:%M:%S")) - 3 * 60 * 60,
-                        source='nplus1.ru',
-                        title=news_this_source.title.text,
-                        description=news_this_source.description.text.strip(),
-                        link=news_this_source.link.text,
-                        media=str(news_this_source.find('media:content')).split('"')[3],
-                        tags=None
-                        )
+            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-6],
+                                                      "%a, %d %b %Y %H:%M:%S")) - 3 * 60 * 60,
+                    'source_id': 1,
+                    'title': news_this_source.title.text,
+                    'description': news_this_source.description.text.strip(),
+                    'link': news_this_source.link.text,
+                    'media': str(news_this_source.find('media:content')).split('"')[3],
+                    'tags': None
+                    }
             result.append(news)
 
         return result
@@ -44,15 +40,15 @@ def parser_dev_by(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = News(date=time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
-                                                       "%a, %d %b %Y %H:%M:%S")),
-                        source='dev.by',
-                        title=news_this_source.title.text,
-                        description=news_this_source.description.text.strip().replace('\xa0', ' '),
-                        link=news_this_source.link.text,
-                        media=str(news_this_source.find('enclosure')).split('"')[3],
-                        tags=None
-                        )
+            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
+                                                      "%a, %d %b %Y %H:%M:%S")),
+                    'source': 'dev.by',
+                    'title': news_this_source.title.text,
+                    'description': news_this_source.description.text.strip().replace('\xa0', ' '),
+                    'link': news_this_source.link.text,
+                    'media': str(news_this_source.find('enclosure')).split('"')[3],
+                    'tags': None
+                    }
             result.append(news)
 
         return result
@@ -67,15 +63,15 @@ def parser_bbc_russian(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = News(date=time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
-                                                       "%a, %d %b %Y %H:%M:%S")),
-                        source='bbc.com/russian',
-                        title=news_this_source.title.text,
-                        description=news_this_source.description.text.strip(),
-                        link=news_this_source.link.text,
-                        media=None,
-                        tags=None
-                        )
+            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
+                                                      "%a, %d %b %Y %H:%M:%S")),
+                    'source': 'bbc.com/russian',
+                    'title': news_this_source.title.text,
+                    'description': news_this_source.description.text.strip(),
+                    'link': news_this_source.link.text,
+                    'media': None,
+                    'tags':None
+                    }
             result.append(news)
 
         return result
@@ -90,15 +86,15 @@ def parser_deutsche_welle(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = News(date=time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
-                                                       "%a, %d %b %Y %H:%M:%S")),
-                        source='dw.com/ru',
-                        title=news_this_source.title.text,
-                        description=news_this_source.description.text.strip(),
-                        link=news_this_source.link.text,
-                        media=None,
-                        tags=None
-                        )
+            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
+                                                      "%a, %d %b %Y %H:%M:%S")),
+                    'source': 'dw.com/ru',
+                    'title': news_this_source.title.text,
+                    'description': news_this_source.description.text.strip(),
+                    'link': news_this_source.link.text,
+                    'media': None,
+                    'tags': None
+                    }
             result.append(news)
 
         return result
@@ -113,21 +109,21 @@ def parser_lenta_ru(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = News(date=time.mktime(time.strptime(news_this_source.pubDate.text[:-6],
-                                                       "%a, %d %b %Y %H:%M:%S")) - 3 * 60 * 60,
-                        source='lenta.ru',
-                        title=news_this_source.title.text,
-                        description=news_this_source.description.text.strip(),
-                        link=news_this_source.link.text,
-                        media=str(news_this_source.find('enclosure')).split('"')[5],
-                        tags=None
-                        )
+            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-6],
+                                                      "%a, %d %b %Y %H:%M:%S")) - 3 * 60 * 60,
+                    'source': 'lenta.ru',
+                    'title': news_this_source.title.text,
+                    'description': news_this_source.description.text.strip(),
+                    'link': news_this_source.link.text,
+                    'media': str(news_this_source.find('enclosure')).split('"')[5],
+                    'tags': None
+                    }
             result.append(news)
 
         return result
 
 
-def parser_century22(url):
+def parser_century22(*url):
     result = []
     all_news_this_source = []
 
@@ -146,31 +142,62 @@ def parser_century22(url):
         all_news_this_source.extend(soup.find_all('article', class_='article-item article-item-1_2'))
 
     for news_this_source in all_news_this_source:
-        news = News(date=time.mktime(time.strptime(news_this_source.select('time')[0]['datatime'],
-                                                   "%Y-%m-%d")),
-                    source='century22.ru',
-                    title=news_this_source.select('h3.item_link a')[0].text.strip().replace('\xa0', ' '),
-                    description=None,
-                    link=news_this_source.select('h3.item_link a')[0]['href'],
-                    media=news_this_source.select('img')[0]['src'],
-                    tags=None
-                    )
+        news = {'date': time.mktime(time.strptime(news_this_source.select('time')[0]['datatime'],
+                                                  "%Y-%m-%d")),
+                'source': 'century22.ru',
+                'title': news_this_source.select('h3.item_link a')[0].text.strip().replace('\xa0', ' '),
+                'description': None,
+                'link': news_this_source.select('h3.item_link a')[0]['href'],
+                'media': news_this_source.select('img')[0]['src'],
+                'tags': None
+                }
         result.append(news)
 
     return result
 
 
-dict_parsers = {'https://nplus1.ru/rss': parser_n_plus_1,
-                'https://dev.by/rss': parser_dev_by,
-                'http://feeds.bbci.co.uk/russian/rss.xml': parser_bbc_russian,
-                'https://rss.dw.com/xml/rss-ru-all': parser_deutsche_welle,
-                'https://lenta.ru/rss/': parser_lenta_ru,
-                ('https://22century.ru/news',
-                 'https://22century.ru/popular-science-publications)'): parser_century22,
-                }
+list_parsers = [{'name': 'N+1: научные статьи, новости, открытия',
+                 'url': 'https://nplus1.ru/',
+                 'logo': 'https://nplus1.ru/i/logo.png',
+                 'links_of_parse': ('https://nplus1.ru/rss', ),
+                 'func_parser': parser_n_plus_1
+                 },
+                {'name': 'ИТ в Беларуси | dev.by',
+                 'url': 'https://dev.by/',
+                 'logo': 'https://dev.by/assets/logo-c39214c7aad5915941bcf4ccda40ac3641f2851d5ec7e897270da373ed9701ad.svg',
+                 'links_of_parse': ('https://dev.by/rss', ),
+                 'func_parser': parser_dev_by
+                 },
+                {'name': 'BBC News Русская служба',
+                 'url': 'https://www.bbc.com/russian',
+                 'logo': 'https://news.files.bbci.co.uk/ws/img/logos/og/russian.png',
+                 'links_of_parse': ('http://feeds.bbci.co.uk/russian/rss.xml', ),
+                 'func_parser': parser_bbc_russian
+                 },
+                {'name': 'Новости и аналитика о Германии, России, Европе, мире | DW',
+                 'url': 'https://www.dw.com/ru',
+                 'logo': 'https://www.dw.com/cssi/dwlogo-print.gif',
+                 'links_of_parse': ('https://rss.dw.com/xml/rss-ru-all', ),
+                 'func_parser': parser_deutsche_welle
+                 },
+                {'name': 'Lenta.ru - Новости России и мира сегодня',
+                 'url': 'https://lenta.ru/',
+                 'logo': 'https://lenta.ru/images/icons/icon-512x512.png',
+                 'links_of_parse': ('https://lenta.ru/rss/', ),
+                 'func_parser': parser_lenta_ru
+                 },
+                {'name': 'Новости науки, техники и технологий. 22 век',
+                 'url': 'https://22century.ru/',
+                 'logo': 'https://22century.ru/wp-content/themes/xxiicentury_new/images/22_century_logo.png',
+                 'links_of_parse': ('https://22century.ru/news',
+                                    'https://22century.ru/popular-science-publications)'),
+                 'func_parser': parser_century22
+                 },
+                ]
 
-all_news = []
-for url, parser in dict_parsers.items():
-    all_news.extend(parser(url))
+if __name__ == "__main__":
+    all_news = []
+    for parser in list_parsers:
+        all_news.extend(parser['func_parser'](*parser['links_of_parse']))
 
-print(*sorted(all_news, reverse=True), len(all_news), sep='\n')
+    print(*sorted(all_news, key=lambda x: x['date'], reverse=True), len(all_news), sep='\n')
