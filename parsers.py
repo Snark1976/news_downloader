@@ -144,7 +144,7 @@ def parser_century22(*url):
     return result
 
 
-list_parsers = [{'name': 'N+1: научные статьи, новости, открытия',
+list_sources = [{'name': 'N+1: научные статьи, новости, открытия',
                  'url': 'https://nplus1.ru',
                  'logo': 'https://nplus1.ru/i/logo.png',
                  'links_of_parse': ('https://nplus1.ru/rss', ),
@@ -185,7 +185,7 @@ list_parsers = [{'name': 'N+1: научные статьи, новости, от
 
 if __name__ == "__main__":
     all_news = []
-    for parser in list_parsers:
+    for parser in list_sources:
         all_news.extend(parser['func_parser'](*parser['links_of_parse']))
 
     print(*sorted(all_news, key=lambda x: x['datetime'], reverse=True), len(all_news), sep='\n')
