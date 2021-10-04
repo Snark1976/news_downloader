@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, MetaData, Table, Integer, String, Column, DateTime, ForeignKey, \
     Text, insert, select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
+from requests.exceptions import RequestException
 from datetime import datetime
 import parsers
 
@@ -40,37 +41,64 @@ news = Table('news', metadata,
 def check_resource_list():
     list_url_sources = [i[0] for i in db_news.execute(select([sources.c.url])).fetchall()]
 
-    for pars in parsers.list_sources:
-        if pars['url'] not in list_url_sources:
+    for resource in parsers.list_sources:
+        if resource['url'] not in list_url_sources:
             db_news.execute(insert(sources),
-                            name=pars['name'],
-                            url=pars['url'],
-                            logo=pars['logo'])
+                            name=resource['name'],
+                            url=resource['url'],
+                            logo=resource['logo'])
 
-            s = select([sources]).where(sources.c.url == pars['url'])
-            source_id = db_news.execute(s).scalar()
-
-            for link in pars['links_of_parse']:
+            for link in resource['links_of_parse']:
                 db_news.execute(insert(source_urls),
-                                source_id=source_id,
+                                source_id=get_source_id(resource['url']),
                                 url=link)
 
 
-def processing_news(data_source):
+def get_source_id(url):
+    sel = select([sources]).where(sources.c.url == url)
+    source_id = db_news.execute(sel).scalar()
+    return source_id
+
+
+def download_news(data_source):
     func_parser = data_source['func_parser']
     urls_source = data_source['links_of_parse']
-    news_source = func_parser(*urls_source)
-
     try:
-        db_news.execute(insert(news), news_source)
-    except IntegrityError:
+        news_source = func_parser(*urls_source)
+    except RequestException:
+        news_source = []
+    return news_source
+
+
+def is_fresh_news(this_news):
+    sel = select([news.c.link]).where(news.c.link == this_news['link'])
+    result = db_news.execute(sel).scalar()
+    print(result)
+    return not result
+
+
+def add_news_to_database(n_list, source_id):
+    n = 0
+    try:
+        for news_ in n_list:
+            if is_fresh_news(news_):
+                news_['source_id'] = source_id
+                db_news.execute(insert(news), news_)
+                n += 1
+    except SQLAlchemyError:
         pass
+    return n
 
 
 metadata.create_all(engine)
 
 if __name__ == "__main__":
     check_resource_list()
+    fresh_news = 0
     for source in parsers.list_sources:
-        processing_news(source)
+        news_list = download_news(source)
+        fresh_news += add_news_to_database(news_list,
+                                           get_source_id(source['url']))
+    print('Add news to DB: ', fresh_news)
+
 
