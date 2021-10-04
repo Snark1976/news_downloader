@@ -1,5 +1,5 @@
 import requests
-import time
+import maya
 from bs4 import BeautifulSoup
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
@@ -17,8 +17,7 @@ def parser_n_plus_1(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-6],
-                                                      "%a, %d %b %Y %H:%M:%S")) - 3 * 60 * 60,
+            news = {'datetime': maya.parse(news_this_source.pubDate.text).datetime(),
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip(),
                     'link': news_this_source.link.text,
@@ -39,8 +38,7 @@ def parser_dev_by(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
-                                                      "%a, %d %b %Y %H:%M:%S")),
+            news = {'datetime': maya.parse(news_this_source.pubDate.text).datetime(),
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip().replace('\xa0', ' '),
                     'link': news_this_source.link.text,
@@ -61,8 +59,7 @@ def parser_bbc_russian(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
-                                                      "%a, %d %b %Y %H:%M:%S")),
+            news = {'datetime': maya.parse(news_this_source.pubDate.text).datetime(),
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip(),
                     'link': news_this_source.link.text,
@@ -83,8 +80,7 @@ def parser_deutsche_welle(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-4],
-                                                      "%a, %d %b %Y %H:%M:%S")),
+            news = {'datetime': maya.parse(news_this_source.pubDate.text).datetime(),
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip(),
                     'link': news_this_source.link.text,
@@ -105,8 +101,7 @@ def parser_lenta_ru(url):
         all_news_this_source = soup.find_all('item')
 
         for news_this_source in all_news_this_source:
-            news = {'date': time.mktime(time.strptime(news_this_source.pubDate.text[:-6],
-                                                      "%a, %d %b %Y %H:%M:%S")) - 3 * 60 * 60,
+            news = {'datetime': maya.parse(news_this_source.pubDate.text).datetime(),
                     'title': news_this_source.title.text,
                     'description': news_this_source.description.text.strip(),
                     'link': news_this_source.link.text,
@@ -137,8 +132,7 @@ def parser_century22(*url):
         all_news_this_source.extend(soup.find_all('article', class_='article-item article-item-1_2'))
 
     for news_this_source in all_news_this_source:
-        news = {'date': time.mktime(time.strptime(news_this_source.select('time')[0]['datatime'],
-                                                  "%Y-%m-%d")),
+        news = {'datetime': maya.parse(news_this_source.select('time')[0]['datatime']).datetime(),
                 'title': news_this_source.select('h3.item_link a')[0].text.strip().replace('\xa0', ' '),
                 'description': None,
                 'link': news_this_source.select('h3.item_link a')[0]['href'],
@@ -194,4 +188,4 @@ if __name__ == "__main__":
     for parser in list_parsers:
         all_news.extend(parser['func_parser'](*parser['links_of_parse']))
 
-    print(*sorted(all_news, key=lambda x: x['date'], reverse=True), len(all_news), sep='\n')
+    print(*sorted(all_news, key=lambda x: x['datetime'], reverse=True), len(all_news), sep='\n')

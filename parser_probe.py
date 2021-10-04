@@ -1,5 +1,5 @@
 import requests
-import time
+import maya
 from bs4 import BeautifulSoup
 from collections import namedtuple
 
@@ -12,31 +12,38 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                          'Safari/537.36'}
 
 
-def parser_lenta_ru():
-    page = requests.get('https://lenta.ru/rss/', headers=headers)
+def parser_n_plus_1(url):
     result = []
+    page = requests.get(url, headers=headers)
+
     if page.status_code == 200:
-        soup = BeautifulSoup(page.text, 'xml')        # Use 'xml' for RSS-channel OR 'lxml' for page of site
+        soup = BeautifulSoup(page.text, 'xml')
         all_news_this_source = soup.find_all('item')
+
         for news_this_source in all_news_this_source:
-            news = News(date=time.mktime(time.strptime(news_this_source.pubDate.text[:-6], "%a, %d %b %Y %H:%M:%S")),
-                        source='lenta.ru',
-                        title=news_this_source.title.text,
-                        description=news_this_source.description.text.strip(),
-                        link=news_this_source.link.text,
-                        media=str(news_this_source.find('enclosure')).split('"')[5],
-                        tags=None
-                        )
+            news = {'datetime': maya.parse(news_this_source.pubDate.text).datetime(),
+                    'title': news_this_source.title.text,
+                    'description': news_this_source.description.text.strip(),
+                    'link': news_this_source.link.text,
+                    'media': str(news_this_source.find('media:content')).split('"')[3],
+                    'tags': None
+                    }
             result.append(news)
-    else:
-        result.append(f'Status: {page.status_code}')    # Change for logging
-    return result
+
+        return result
 
 
-all_news = []
-dict_parsers = {'https://lenta.ru/rss/': parser_lenta_ru}
+list_parsers = [{'name': 'N+1: научные статьи, новости, открытия',
+                 'url': 'https://nplus1.ru',
+                 'logo': 'https://nplus1.ru/i/logo.png',
+                 'links_of_parse': ('https://nplus1.ru/rss', ),
+                 'func_parser': parser_n_plus_1
+                 },
+                ]
 
-for parser in dict_parsers.values():
-    all_news.extend(parser())
+if __name__ == "__main__":
+    all_news = []
+    for parser in list_parsers:
+        all_news.extend(parser['func_parser'](*parser['links_of_parse']))
 
-print(*sorted(all_news), sep='\n')
+    print(*sorted(all_news, key=lambda x: x['datetime'], reverse=True), len(all_news), sep='\n')
