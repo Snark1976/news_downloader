@@ -2,7 +2,6 @@ from sqlalchemy import create_engine, MetaData, Table, Integer, String, Column, 
     Text, insert, select
 from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException
-from datetime import datetime
 import parsers
 
 metadata = MetaData()
@@ -28,11 +27,11 @@ news = Table('news', metadata,
              Column('id', Integer(), primary_key=True),
              Column('source_id', Integer(), ForeignKey('sources.id')),
              Column('title', Text, nullable=False),
-             Column('description', Text),
-             Column('datetime', DateTime(), default=datetime.now),
+             Column('description', Text, nullable=False),
+             Column('datetime', DateTime(), nullable=False),
              Column('link', String(768), unique=True),
-             Column('media', Text),
-             Column('tags', Text)
+             Column('media', Text, nullable=False),
+             Column('tags', Text, nullable=False)
              )
 
 
@@ -100,5 +99,3 @@ if __name__ == "__main__":
         fresh_news += add_news_to_database(news_list,
                                            get_source_id(source['url']))
     print('Add news to DB: ', fresh_news)
-
-
