@@ -30,7 +30,7 @@ news = Table('news', metadata,
              Column('description', Text, nullable=False),
              Column('datetime', DateTime(), nullable=False),
              Column('link', String(768), unique=True),
-             Column('media', Text, nullable=False),
+             Column('media', Text),
              Column('tags', Text, nullable=False)
              )
 
@@ -38,64 +38,82 @@ news = Table('news', metadata,
 # Compare the list of resources in the database (tables "sources" and "source_urls") and in the parser module
 # (parsers.py). Add new resources to the database.
 def check_resource_list():
-    list_url_sources = [i[0] for i in db_news.execute(select([sources.c.url])).fetchall()]
+    try:
+        list_url_sources = [i[0] for i in db_news.execute(select([sources.c.url])).fetchall()]
+        for resource in parsers.list_sources:
+            if resource['url'] not in list_url_sources:
+                db_news.execute(insert(sources),
+                                name=resource['name'],
+                                url=resource['url'],
+                                logo=resource['logo'])
 
-    for resource in parsers.list_sources:
-        if resource['url'] not in list_url_sources:
-            db_news.execute(insert(sources),
-                            name=resource['name'],
-                            url=resource['url'],
-                            logo=resource['logo'])
-
-            for link in resource['links_of_parse']:
-                db_news.execute(insert(source_urls),
-                                source_id=get_source_id(resource['url']),
-                                url=link)
+                for link in resource['links_of_parse']:
+                    db_news.execute(insert(source_urls),
+                                    source_id=get_source_id(resource['url']),
+                                    url=link)
+    except SQLAlchemyError:
+        pass
 
 
+# Getting id from table "sources" by url value
 def get_source_id(url):
     sel = select([sources]).where(sources.c.url == url)
     source_id = db_news.execute(sel).scalar()
     return source_id
 
 
+# Loading a list of fresh news from a source
 def download_news(data_source):
+    result = []
     func_parser = data_source['func_parser']
+    func_checking_news = data_source['func_checking']
     urls_source = data_source['links_of_parse']
+    source_id = get_source_id(data_source['url'])
+
     try:
-        news_source = func_parser(*urls_source)
+        list_news = func_parser(*urls_source)
+        for news_ in list_news:
+            try:
+                if is_fresh_news(news_):
+                    news_['source_id'] = source_id
+                    result.append(func_checking_news(news_))
+
+            except RequestException:
+                pass
+            except SQLAlchemyError:
+                pass
+
     except RequestException:
-        news_source = []
-    return news_source
+        pass
+
+    return result
 
 
+# Checking the presence of this news in the database
 def is_fresh_news(this_news):
     sel = select([news.c.link]).where(news.c.link == this_news['link'])
     result = db_news.execute(sel).scalar()
-    print(result)
     return not result
 
 
-def add_news_to_database(n_list, source_id):
-    n = 0
-    try:
-        for news_ in n_list:
-            if is_fresh_news(news_):
-                news_['source_id'] = source_id
-                db_news.execute(insert(news), news_)
-                n += 1
-    except SQLAlchemyError:
-        pass
-    return n
+def add_news_to_database(n_list):
+    pass
+    # try:
 
+    # except SQLAlchemyError:
+    #    pass
 
-metadata.create_all(engine)
 
 if __name__ == "__main__":
+    metadata.create_all(engine)
     check_resource_list()
-    fresh_news = 0
+    news_list = []
     for source in parsers.list_sources:
-        news_list = download_news(source)
-        fresh_news += add_news_to_database(news_list,
-                                           get_source_id(source['url']))
-    print('Add news to DB: ', fresh_news)
+        news_list.extend(download_news(source))
+    news_list.sort(key=lambda x: x['datetime'])
+    for news_ in news_list:
+        try:
+            db_news.execute(insert(news), news_)
+        except SQLAlchemyError:
+            print('Error', news_)
+    print('Add news to DB: ', len(news_list))
