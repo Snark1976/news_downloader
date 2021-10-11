@@ -27,7 +27,7 @@ def parser_n_plus_1(url):
                     }
             result.append(news)
 
-        return result
+    return result
 
 
 def parser_dev_by(url):
@@ -48,7 +48,7 @@ def parser_dev_by(url):
                     }
             result.append(news)
 
-        return result
+    return result
 
 
 def parser_bbc_russian(url):
@@ -65,11 +65,11 @@ def parser_bbc_russian(url):
                     'description': news_this_source.description.text.strip().replace('\xa0', ' '),
                     'link': news_this_source.link.text,
                     'media': None,
-                    'tags':None
+                    'tags': None
                     }
             result.append(news)
 
-        return result
+    return result
 
 
 def parser_deutsche_welle(url):
@@ -90,7 +90,7 @@ def parser_deutsche_welle(url):
                     }
             result.append(news)
 
-        return result
+    return result
 
 
 def parser_lenta_ru(url):
@@ -111,7 +111,7 @@ def parser_lenta_ru(url):
                     }
             result.append(news)
 
-        return result
+    return result
 
 
 def parser_century22(*url):
@@ -234,7 +234,7 @@ list_sources = [
     {'name': 'BBC News Русская служба',
      'url': 'https://www.bbc.com/russian',
      'logo': 'https://news.files.bbci.co.uk/ws/img/logos/og/russian.png',
-     'links_of_parse': ('http://feeds.bbci.co.uk/russian/rss.xml', ),
+     'links_of_parse': ('https://feeds.bbci.co.uk/russian/rss.xml', ),
      'func_parser': parser_bbc_russian,
      'func_checking': parser_bbc_russian_news_checking
      },
@@ -263,13 +263,13 @@ list_sources = [
 ]
 
 if __name__ == "__main__":
-    # all_news = []
-    # for parser in list_sources:
-    #     all_news.extend(parser['func_parser'](*parser['links_of_parse']))
+    all_news = []
+    for parser in list_sources:
+        all_news.extend(parser['func_parser'](*parser['links_of_parse']))
     #
     # print(*sorted(all_news, key=lambda x: x['datetime'], reverse=True), len(all_news), sep='\n')
-    parser = list_sources[0]
-    news = parser['func_parser'](*parser['links_of_parse'])
-    for nws in news:
-        result = parser['func_checking'](nws)
-        print(result)
+    # parser = list_sources[0]
+    # news = parser['func_parser'](*parser['links_of_parse'])
+    # for nws in news:
+    #     result = parser['func_checking'](nws)
+    #     print(result)

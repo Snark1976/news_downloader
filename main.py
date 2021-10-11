@@ -2,13 +2,17 @@ from sqlalchemy import create_engine, MetaData, Table, Integer, String, Column, 
     Text, insert, select
 from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException
+from datetime import datetime
+import logging
 import parsers
 
 metadata = MetaData()
 
-engine = create_engine("mysql+pymysql://root:Colobuc@localhost/db_news", echo=True)
+engine = create_engine("mysql+pymysql://root:Colobuc@localhost/db_news")
 
 db_news = engine.connect()
+
+logging.basicConfig(filename="timeline.log", level=logging.INFO)
 
 sources = Table('sources', metadata,
                 Column('id', Integer(), primary_key=True),
@@ -97,23 +101,20 @@ def is_fresh_news(this_news):
 
 
 def add_news_to_database(n_list):
-    pass
-    # try:
-
-    # except SQLAlchemyError:
-    #    pass
+    for news_ in n_list:
+        try:
+            db_news.execute(insert(news), news_)
+        except SQLAlchemyError:
+            print('Error', news_)
 
 
 if __name__ == "__main__":
+    logging.info(f' Time: {datetime.now()}. Start loading news.')
     metadata.create_all(engine)
     check_resource_list()
     news_list = []
     for source in parsers.list_sources:
         news_list.extend(download_news(source))
     news_list.sort(key=lambda x: x['datetime'])
-    for news_ in news_list:
-        try:
-            db_news.execute(insert(news), news_)
-        except SQLAlchemyError:
-            print('Error', news_)
-    print('Add news to DB: ', len(news_list))
+    add_news_to_database(news_list)
+    logging.info(f' Time: {datetime.now()}. Stop loading news. Add news to DB: {len(news_list)}')
