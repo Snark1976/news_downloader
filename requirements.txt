@@ -4,3 +4,4 @@ maya~=0.6.1
 bs4~=0.0.1
 beautifulsoup4~=4.10.0
 PyMySQL~=1.0.2
+lxml
