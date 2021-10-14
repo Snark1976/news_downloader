@@ -61,7 +61,10 @@ def parser_dev_by(url):
             try:
                 news = {'datetime': maya.parse(news_this_source.pubDate.text).datetime(),
                         'title': news_this_source.title.text.replace('\xa0', ' '),
-                        'description': news_this_source.description.text.strip().replace('\xa0', ' '),
+                        'description': (news_this_source.description.text.strip().replace('\xa0', ' ')
+                                        if news_this_source.description
+                                        else None
+                                        ),
                         'link': news_this_source.link.text,
                         'media': str(news_this_source.find('enclosure')).split('"')[3],
                         'tags': None
@@ -198,10 +201,13 @@ def parser_dev_by_news_checking(news):
     if page := get_page(news['link']):
         try:
             soup = BeautifulSoup(page.text, 'lxml')
-            news['tags'] = [st.text
-                            for st in soup.select('span.article-meta__item')
-                            if 'Тег' in st.text
-                            ][0].replace('Теги: ', '')
+            tags = [st.text for st in soup.select('span.article-meta__item') if 'Тег' in st.text]
+            news['tags'] = tags[0].replace('Теги: ', '') if tags else 'Без тегов'
+            if not news['description']:
+                for paragraph in soup.select('p'):
+                    if len(paragraph.text) > 200:
+                        news['description'] = paragraph.text.strip().replace('\xa0', ' ').replace('\n', ' ')
+                        break
 
         except (LookupError, TypeError, AttributeError, NameError, ValueError):
             logging.exception(f'Parsing error. Parsed page: \n{news["link"]}')
