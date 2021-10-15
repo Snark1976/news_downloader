@@ -78,8 +78,10 @@ def download_news(data_source):
 
     list_news = func_parser(*urls_source)
     if source_id := get_source_id(data_source['url']):
+        list_fresh_news = []
         for news_ in list_news:
-            if is_fresh_news(news_):
+            if is_fresh_news(news_) and news_['link'] not in list_fresh_news:
+                list_fresh_news.append(news_['link'])
                 news_['source_id'] = source_id
                 result.append(func_checking_news(news_))
     return result
