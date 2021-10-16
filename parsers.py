@@ -4,13 +4,14 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timezone
 from requests.exceptions import RequestException
 import logging
+import config
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                          'AppleWebKit/537.36 (KHTML, like Gecko) '
                          'Chrome/94.0.4606.61 '
                          'Safari/537.36'}
 
-logging.basicConfig(filename="timeline.log", level=logging.INFO)
+logging.basicConfig(filename=config.filename_log, level=logging.INFO)
 
 
 def get_page(url):

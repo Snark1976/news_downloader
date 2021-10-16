@@ -4,14 +4,15 @@ from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import logging
 import parsers
+import config
 
 metadata = MetaData()
 
-engine = create_engine("mysql+pymysql://root:Colobuc@localhost/db_news")
+engine = create_engine(config.db_connection_string)
 
 db_news = engine.connect()
 
-logging.basicConfig(filename="timeline.log", level=logging.INFO)
+logging.basicConfig(filename=config.filename_log, level=logging.INFO)
 
 sources = Table('sources', metadata,
                 Column('id', Integer(), primary_key=True),

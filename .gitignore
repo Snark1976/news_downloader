@@ -1,3 +1,4 @@
 /.idea/
 /venv/
 /timeline.log
+/config.py

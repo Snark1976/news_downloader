@@ -1,0 +1,3 @@
+filename_log = '~/News downloader/timeline.log'
+
+db_connection_string = 'mysql+pymysql://root:password@localhost/db_news'
