@@ -140,7 +140,7 @@ def parser_lenta_ru(url):
                         'description': news_this_source.description.text.strip().replace('\xa0', ' '),
                         'link': news_this_source.link.text,
                         'media': str(news_this_source.find('enclosure')).split('"')[5],
-                        'tags': news_this_source.category.text
+                        'tags': news_this_source.category.text if news_this_source.category else 'Без тега'
                         }
                 result.append(news)
 
