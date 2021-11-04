@@ -1,3 +1,11 @@
-filename_log = '~/news_downloader/timeline.log'
+filename_log = 'timeline.log'
 
-db_connection_string = 'mysql+pymysql://root:password@localhost/db_news'
+name_user_db = 'root'
+
+password_user_db = 'password'
+
+host_db = 'localhost'
+
+name_db = 'db_news'
+
+db_connection_string = f'mysql+pymysql://{name_user_db}:{password_user_db}@/{host_db}/{name_db}'
