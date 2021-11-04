@@ -12,7 +12,7 @@
 #                          'Chrome/94.0.4606.61 '
 #                          'Safari/537.36'}
 #
-# logging.basicConfig(filename="News downloader.log", level=logging.INFO)
+# logging.basicConfig(filename="news_downloader.log", level=logging.INFO)
 #
 #
 # def get_page(url):
