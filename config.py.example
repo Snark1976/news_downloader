@@ -8,4 +8,4 @@ host_db = 'localhost'
 
 name_db = 'db_news'
 
-db_connection_string = f'mysql+pymysql://{name_user_db}:{password_user_db}@/{host_db}/{name_db}'
+db_connection_string = f'mysql+pymysql://{name_user_db}:{password_user_db}@{host_db}/{name_db}'
