@@ -2,6 +2,8 @@ from sqlalchemy import create_engine, MetaData, Table, Integer, String, Column, 
     Text, insert, select, func
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+from itertools import chain
+from multiprocessing import Pool
 import logging
 import parsers
 import config
@@ -119,9 +121,9 @@ if __name__ == "__main__":
     logging.info(f' Time: {datetime.now()}. Start loading news.')
     check_resource_list()
     count_news = get_count_news()
-    news_list = []
-    for source in parsers.list_sources:
-        news_list.extend(download_news(source))
+    pool = Pool(processes=8)
+    news_list = pool.map(download_news, parsers.list_sources)
+    news_list = list(chain(*news_list))
     news_list.sort(key=lambda x: x['datetime'])
     add_news_to_database(news_list)
     logging.info(f' Time: {datetime.now()}. Stop loading news. Added news to DB: {get_count_news() - count_news}')
